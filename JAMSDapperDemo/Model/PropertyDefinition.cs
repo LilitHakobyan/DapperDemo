@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-
-
 
 namespace JAMSDapperDemo.Model
 {
@@ -67,40 +64,58 @@ namespace JAMSDapperDemo.Model
         [ForeignKey("TenantId,CategoryId")]
         [InverseProperty("PropertyDefinitions")]
         public Category Category { get; set; }
+
         [InverseProperty("PropertyDefinition")]
         public TenantProperty TenantProperty { get; set; }
+
         [InverseProperty(nameof(AgentProperty.PropertyDefinition))]
         public ICollection<AgentProperty> AgentProperties { get; set; }
+
         [InverseProperty(nameof(AppMenuElementProperty.PropertyDefinition))]
         public ICollection<AppMenuElementProperty> AppMenuElementProperties { get; set; }
+
         [InverseProperty(nameof(ConfigurationElementProperty.PropertyDefinition))]
         public ICollection<ConfigurationElementProperty> ConfigurationElementProperties { get; set; }
+
         [InverseProperty(nameof(EntryElementProperty.PropertyDefinition))]
         public ICollection<EntryElementProperty> EntryElementProperties { get; set; }
+
         [InverseProperty(nameof(EntryProperty.PropertyDefinition))]
         public ICollection<EntryProperty> EntryProperties { get; set; }
+
         [InverseProperty(nameof(FolderElementProperty.PropertyDefinition))]
         public ICollection<FolderElementProperty> FolderElementProperties { get; set; }
+
         [InverseProperty(nameof(FolderElementPropertyAt.PropertyDefinition))]
         public ICollection<FolderElementPropertyAt> FolderElementPropertyAts { get; set; }
+
         [InverseProperty(nameof(FolderProperty.PropertyDefinition))]
         public ICollection<FolderProperty> FolderProperties { get; set; }
+
         [InverseProperty(nameof(JobElementProperty.PropertyDefinition))]
         public ICollection<JobElementProperty> JobElementProperties { get; set; }
+
         [InverseProperty(nameof(JobElementPropertyAt.PropertyDefinition))]
         public ICollection<JobElementPropertyAt> JobElementPropertyAts { get; set; }
+
         [InverseProperty(nameof(JobProperty.PropertyDefinition))]
         public ICollection<JobProperty> JobProperties { get; set; }
+
         [InverseProperty(nameof(JobPropertyAt.PropertyDefinition))]
         public ICollection<JobPropertyAt> JobPropertyAts { get; set; }
+
         [InverseProperty(nameof(MethodJobProperty.PropertyDefinition))]
         public ICollection<MethodJobProperty> MethodJobProperties { get; set; }
+
         [InverseProperty(nameof(MethodJobPropertyAt.PropertyDefinition))]
         public ICollection<MethodJobPropertyAt> MethodJobPropertyAts { get; set; }
+
         [InverseProperty(nameof(MethodProperty.PropertyDefinition))]
         public ICollection<MethodProperty> MethodProperties { get; set; }
+
         [InverseProperty(nameof(MethodPropertyAt.PropertyDefinition))]
         public ICollection<MethodPropertyAt> MethodPropertyAts { get; set; }
+
         [InverseProperty(nameof(UserSettingElementProperty.PropertyDefinition))]
         public ICollection<UserSettingElementProperty> UserSettingElementProperties { get; set; }
     }

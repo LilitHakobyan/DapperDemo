@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-
-
 
 namespace JAMSDapperDemo.Model
 {
@@ -28,6 +24,7 @@ namespace JAMSDapperDemo.Model
         [ForeignKey("TenantId,Jamsentry")]
         [InverseProperty("EntryProperties")]
         public Entry Entry { get; set; }
+
         [ForeignKey("TenantId,PropertyId")]
         [InverseProperty("EntryProperties")]
         public PropertyDefinition PropertyDefinition { get; set; }

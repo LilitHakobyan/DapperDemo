@@ -1,8 +1,8 @@
-﻿using System;
-using System.Data;
-using System.Linq;
-using Dapper;
-using JAMSDapperDemo.Model;
+﻿using JAMSDapperDemo.Model;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace JAMSDapperDemo
 {
@@ -10,43 +10,110 @@ namespace JAMSDapperDemo
     {
         static void Main(string[] args)
         {
-            string sqlAgents = "SELECT TOP 5 * FROM Agent;";
-            string sqlJob = "SELECT * FROM Job WHERE JobId = @JobId;";
-            string sqlAgentInsert = "INSERT INTO Agent (AgentName, Description, LastChangedBy, LastChange, TenantId, AgentElementTypeId, PlatformElementTypeId, JobLimit, Online, AgentUid ) " +
-                                    "Values (@AgentName, @LastChangedBy, @Description, @LastChange, @TenantId, @AgentElementTypeId, @PlatformElementTypeId, @JobLimit, @Online, @AgentUid);";
+            var stopWa = new Stopwatch();
+            var filePath = @"C:\Users\Lilit.Hakobyan\Documents\EFDapperDemo\DapperResults.csv";
+            var performanceData = new StringBuilder();
 
-            var jamsContextConnection = new JAMSDapperContext().CreateConnection();
+            // create IDb connection
+            using var jamsContextConnection = new JAMSDapperContext().CreateConnection();
+
+            // open connection
+            jamsContextConnection.Open();
+
+            // create basic operation instance 
+            var basicOperation = new BasicOperationsSamples(jamsContextConnection);
+            basicOperation.GetAgent();
 
             //Single =  Execute a single time a SQL Command.
-            var affectedRows = jamsContextConnection.Execute(sqlAgentInsert,
-                new
-                {
-                    AgentName = "DapperAgent1",
-                    LastChangedBy = "DapperUser",
-                    Description = "Agent from Dapper demo",
-                    LastChange = new DateTime(2021, 01, 01, 0, 0, 0),
-                    TenantId = 1,
-                    AgentElementTypeId = 84,
-                    PlatformElementTypeId = 104,
-                    JobLimit = 999,
-                    Online = 1,
-                    AgentUid = Guid.NewGuid()
-                });
-
-            Console.WriteLine(affectedRows);
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.AddAgent();
+            stopWa.Stop();
+            performanceData.AppendLine($"Add Agent , {stopWa.ElapsedMilliseconds}ms");
 
             // Only for see the Insert.
-            var dapperAgent = jamsContextConnection.Query<Agent>("Select * FROM Agent WHERE AgentName = 'DapperAgent'").FirstOrDefault();
+            stopWa.Reset();
+            stopWa.Start();
+            var dapperAgent = basicOperation.GetAgent();
+            stopWa.Stop();
+            performanceData.AppendLine($"Get Agent , {stopWa.ElapsedMilliseconds}ms");
 
+            // Only for see the Insert.
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.UpdateAgent(dapperAgent);
+            stopWa.Stop();
+            performanceData.AppendLine($"Update Agent , {stopWa.ElapsedMilliseconds}ms");
             Console.WriteLine(dapperAgent?.Description);
 
-            var sp = "FindAgent";
-            var spAffectedRows = jamsContextConnection.Execute(sp,
-                new { @agent_name = "DapperAgent", @tenant_id = 1 },
-                commandType: CommandType.StoredProcedure);
+            // delete agent
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.DeleteAgent(dapperAgent);
+            stopWa.Stop();
+            performanceData.AppendLine($"Delete Agent , {stopWa.ElapsedMilliseconds}ms");
 
-            Console.WriteLine(spAffectedRows);
+            // get job by id
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.GetJobById();
+            stopWa.Stop();
+            performanceData.AppendLine($"Get Job by Id, {stopWa.ElapsedMilliseconds}ms");
+
+            // get job by id with navigation props
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.GetJobByIdWithNavigationProps();
+            stopWa.Stop();
+            performanceData.AppendLine($"Get one job with navigation props, {stopWa.ElapsedMilliseconds}ms");
+
+            // get all job by id with navigation props
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.GetAllJobsWithNavigationProps();
+            stopWa.Stop();
+            performanceData.AppendLine($"Get all job with navigation props, {stopWa.ElapsedMilliseconds}ms");
+
+            // get all jobs by tenant
+            stopWa.Reset();
+            stopWa.Start();
+            basicOperation.GetAllJobsByTenant();
+            stopWa.Stop();
+            performanceData.AppendLine($"Get all jobs by tenant id , {stopWa.ElapsedMilliseconds}ms");
+
+            // create sp 
+            var storedProcedureSamples = new StoredProcedureSamples(jamsContextConnection);
+
+            // insert agent sp
+            stopWa.Reset();
+            stopWa.Start();
+            var agentId = storedProcedureSamples.InsertAgent();
+            stopWa.Stop();
+            performanceData.AppendLine($"SP Insert Agent , {stopWa.ElapsedMilliseconds}ms");
+
+            // find agent stored procedure 
+            stopWa.Reset();
+            stopWa.Start();
+            storedProcedureSamples.FindAgent();
+            stopWa.Stop();
+            performanceData.AppendLine($"SP Find Agent , {stopWa.ElapsedMilliseconds}ms");
+
+            // get agent multi result set example 
+            stopWa.Reset();
+            stopWa.Start();
+            storedProcedureSamples.GetAgent();
+            stopWa.Stop();
+            performanceData.AppendLine($"SP Get Agent , {stopWa.ElapsedMilliseconds}ms");
+
+            // insert agent sp
+            stopWa.Reset();
+            stopWa.Start();
+            storedProcedureSamples.DeleteAgent(agentId);
+            stopWa.Stop();
+            performanceData.AppendLine($"SP Delete Agent , {stopWa.ElapsedMilliseconds}ms");
+
+            // write results in file
+            File.AppendAllText(filePath, performanceData.ToString());
         }
     }
 }
-    
