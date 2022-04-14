@@ -11,7 +11,7 @@ namespace JAMSDapperDemo.Model
         /// <summary>
         /// JAMS db connection string
         /// </summary>
-        private readonly string _connectionString = "Server=HSATP-JH1CGG3;Database=JAMS;Trusted_Connection=True;";
+        private readonly string _connectionString = "";
 
         /// <summary>
         /// Creates new instance of JAMS connection
